@@ -19,9 +19,6 @@ public class Finder {
         return list.toArray(new String[list.size()]);
     }
     
-    private boolean isTarget(File file){
-        return true;
-    }
     
     private void traverse(List<String> list, File dir){
         if(isTarget(dir)){
@@ -39,10 +36,22 @@ public class Finder {
         if(args.getName() != null){
             flag &= checkTargetName(file, args.getName());
         }
+        if(args.getType() != null){
+            flag &= checkTargetType(file, args.getType());
+        }
         return flag;
     }
-    private boolean checkTargetName(File file, String pattern){
-        String name = file.getName();
-        return name.indexOf(pattern) >= 0;
+    private boolean checkTargetType(File file, String type){
+        type = type.toLowerCase();
+        if(type.equals("d") || type.equals("directory")){
+            return file.isDirectory();
+        }
+        else if(type.equals("f") || type.equals("file")){
+            return file.isFile();
+        }
+        else if(type.equals("h") || type.equals("hidden")){
+            return file.isHidden();
+        }
+        return false;
     }
 }

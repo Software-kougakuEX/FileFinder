@@ -5,33 +5,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.BufferedReader;
 import java.io.FileReader;
-
+import java.io.IOException;
+import java.io.FileNotFoundException;
 
 public class Finder {
     private Args args;
-    
+
     public Finder(Args args){
         this.args = args;
     }
-    
+
     public String[] find(String target){
         List<String> list = new ArrayList<>();
-        
+
         traverse(list, new File(target));
-        
+
         return list.toArray(new String[list.size()]);
-    }
-    
-    
-    private void traverse(List<String> list, File dir){
-        if(isTarget(dir)){
-            list.add(dir.getPath());
-        }
-        if(dir.isDirectory()){
-            for(File file: dir.listFiles()){
-                traverse(list, file);
-            }
-        }
     }
 
     private boolean isTarget(File file){
@@ -51,13 +40,22 @@ public class Finder {
 
         return flag;
     }
-    
+
+    private void traverse(List<String> list, File dir){
+        if(isTarget(dir)){
+            list.add(dir.getPath());
+        }
+        if(dir.isDirectory()){
+            for(File file: dir.listFiles()){
+                traverse(list, file);
+            }
+        }
+    }
     private boolean checkTargetName(File file, String pattern){
         String name = file.getName();
         return name.indexOf(pattern) >= 0;
     }
-    
-    private boolean checkTargetType(File file, String type){
+     private boolean checkTargetType(File file, String type){
         type = type.toLowerCase();
         if(type.equals("d") || type.equals("directory")){
             return file.isDirectory();
@@ -70,8 +68,6 @@ public class Finder {
         }
         return false;
     }
-
-
     private boolean checkTargetSize(File file, String sizeString){
         if(file.isFile()){
             char sign = sizeString.charAt(0);
@@ -91,7 +87,6 @@ public class Finder {
         }
         return false;
     }
-
     private boolean checkGrep(File file, String pattern){
         if(file.isFile()){
             try(BufferedReader in = new BufferedReader(new FileReader(file))){
@@ -101,6 +96,9 @@ public class Finder {
                         return true;
                     }
                 }
+            }
+            catch(IOException e){
+                //do nothing
             }
         }
         return false;
